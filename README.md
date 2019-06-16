@@ -1,4 +1,4 @@
-# Orange Reset 
+# Lime Reset 
 
 Provides tags that include "reset" styles similar to
 Yelp's [lemon reset](https://github.com/Yelp/lemon-reset) library for React.
