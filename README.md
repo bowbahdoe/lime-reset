@@ -70,4 +70,7 @@ in order to style the `blockquote` and `q` tags. As far as I am aware
 [it is impossible to use pseudo-selectors with inline css](https://stackoverflow.com/questions/5293280/css-pseudo-classes-with-inline-styles),
 so making an inline stylesheet with (as is done by elm-css) is the only way
 to make these tags in a redistributable way. As a consequence, these tags do not produce 
-the `Html msg` from `elm/html` but instead make the `Html msg` from `rtfieldman/elm-css`.
+the [`Html msg`](https://package.elm-lang.org/packages/elm/html/latest/Html#Html)
+from [`elm/html`](https://package.elm-lang.org/packages/elm/html/latest)
+but instead make the [`Html msg`](https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/Html-Styled#Html)
+from [`rtfieldman/elm-css`](https://package.elm-lang.org/packages/rtfeldman/elm-css/latest).
