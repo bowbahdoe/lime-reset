@@ -63,9 +63,10 @@ table {
 ```
 
 These tags use [elm-css](https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/Css)
-for their implementation. This is neccisary because the stylesheet that is
+for their implementation. This is necessary because the stylesheet that is
 being replicated makes use of the `:before` and `:after` css pseudo-selectors
 in order to style the `blockquote` and `q` tags. As far as I am aware 
 [it is impossible to use pseudo-selectors in inline css](https://stackoverflow.com/questions/5293280/css-pseudo-classes-with-inline-styles),
-so making an inline stylesheet with (as is done by elm-css) is the best way
-to make these tags shareable.
+so making an inline stylesheet with (as is done by elm-css) is the only way
+to make these tags in a redistributable way. As a consequence, these tags do not produce 
+the `Html msg` from `elm/html` but instead make the `Html msg` from `rtfieldman/elm-css`.
