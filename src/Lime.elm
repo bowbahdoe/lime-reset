@@ -3,7 +3,6 @@ module Lime exposing
     , abbr
     , acronym
     , address
-    , applet
     , article
     , aside
     , audio
@@ -83,7 +82,6 @@ module Lime exposing
 import Css
 import Dict exposing (Dict)
 import Html.Styled as Html
-import Html.Styled.Attributes as Attributes
 
 
 {-| The name of a tag. This module is pretty loose with static typing, so this is
@@ -100,39 +98,32 @@ type alias StyleDict =
     Dict TagName (List Css.Style)
 
 
-{-| Combines two dictionaries of the same type using the given function to combine any
-values that are under the same key.
+makeStyleDict : List ( List TagName, List Css.Style ) -> StyleDict
+makeStyleDict stylePairs =
+    let
+        combineDicts : (a -> a -> a) -> Dict comparable a -> Dict comparable a -> Dict comparable a
+        combineDicts mergeValues d1 d2 =
+            Dict.merge
+                Dict.insert
+                (\k v1 v2 -> Dict.insert k (mergeValues v1 v2))
+                Dict.insert
+                d1
+                d2
+                Dict.empty
+
+        makeDict : ( List TagName, List Css.Style ) -> StyleDict
+        makeDict ( tagNames, styles ) =
+            Dict.fromList (List.map (\tagName -> ( tagName, styles )) tagNames)
+    in
+    List.foldl (combineDicts (++)) Dict.empty (List.map makeDict stylePairs)
+
+
+{-| The actual meyer reset stylings.
 -}
-combineDicts : (a -> a -> a) -> Dict comparable a -> Dict comparable a -> Dict comparable a
-combineDicts mergeValues d1 d2 =
-    Dict.merge
-        Dict.insert
-        (\k v1 v2 -> Dict.insert k (mergeValues v1 v2))
-        Dict.insert
-        d1
-        d2
-        Dict.empty
-
-
-mergeTagStyleDicts : List StyleDict -> StyleDict
-mergeTagStyleDicts dicts =
-    List.foldl (combineDicts (++)) Dict.empty dicts
-
-
-{-| Shorthand to make a dictionary that associates a bunch of tags with a set of styles.
-For this module, there are a lot more tag names than styles to associate and the styles
-aren't such that they can be given sensible names.
--}
-makeStyleDict : List TagName -> List Css.Style -> StyleDict
-makeStyleDict tagNames style =
-    Dict.fromList (List.map (\tagName -> ( tagName, style )) tagNames)
-
-
-styleDict : StyleDict
-styleDict =
-    mergeTagStyleDicts
-        [ makeStyleDict
-            [ "html" -- TODO: This is the only tag that i do not expose. What use would `html` be even?
+meyerStyles : StyleDict
+meyerStyles =
+    makeStyleDict
+        [ ( [ "html"
             , "body"
             , "div"
             , "span"
@@ -214,15 +205,15 @@ styleDict =
             , "audio"
             , "video"
             ]
-            [ Css.property "margin" "0"
+          , [ Css.property "margin" "0"
             , Css.property "padding" "0"
             , Css.property "border" "0"
             , Css.fontSize (Css.pct 100)
             , Css.property "font" "inherit"
             , Css.verticalAlign Css.baseline
             ]
-        , makeStyleDict
-            [ "article"
+          )
+        , ( [ "article"
             , "aside"
             , "details"
             , "figcaption"
@@ -234,14 +225,14 @@ styleDict =
             , "nav"
             , "section"
             ]
-            [ Css.display Css.block ]
-        , makeStyleDict [ "body" ] [ Css.lineHeight (Css.num 1) ]
-        , makeStyleDict [ "ol", "ul" ] [ Css.listStyle Css.none ]
-        , makeStyleDict
-            [ "blockquote"
+          , [ Css.display Css.block ]
+          )
+        , ( [ "body" ], [ Css.lineHeight (Css.num 1) ] )
+        , ( [ "ol", "ul" ], [ Css.listStyle Css.none ] )
+        , ( [ "blockquote"
             , "q"
             ]
-            [ Css.property "quotes" "none"
+          , [ Css.property "quotes" "none"
             , Css.before
                 [ Css.property "content" "''"
                 , Css.property "content" "none"
@@ -251,422 +242,433 @@ styleDict =
                 , Css.property "content" "none"
                 ]
             ]
-        , makeStyleDict [ "table" ]
-            [ Css.borderCollapse Css.collapse
+          )
+        , ( [ "table" ]
+          , [ Css.borderCollapse Css.collapse
             , Css.property "border-spacing" "0"
             ]
+          )
         ]
-
-
-tagStyle : TagName -> Css.Style
-tagStyle tagName =
-    Css.batch (Maybe.withDefault [] (Dict.get tagName styleDict))
 
 
 {-| A "normal" html tag. It takes in a list of attributes and a list of
 children in order to produce some html. This type signature is repeated quite a bit,
 so it is worth making this alias as a shorthand.
 -}
-type alias NormalTag msg =
+type alias Tag msg =
     List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
 
 
-makeTag : TagName -> NormalTag msg
+makeTag : TagName -> Tag msg
 makeTag tagName =
-    \attrs children ->
-        Html.node tagName (Attributes.css [ tagStyle tagName ] :: attrs) children
+    Html.styled
+        (Html.node tagName)
+        (Maybe.withDefault [] (Dict.get tagName meyerStyles))
 
 
-embed : NormalTag msg
+
+-- All definitions come from the Mozilla Developer Network.
+-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/
+{- What use would `html` be even?
+   html : Tag msg
+   html =
+     makeTag "html"
+-}
+
+
+embed : Tag msg
 embed =
     makeTag "embed"
 
 
-img : NormalTag msg
+img : Tag msg
 img =
     makeTag "img"
 
 
-a : NormalTag msg
+a : Tag msg
 a =
     makeTag "a"
 
 
-abbr : NormalTag msg
+abbr : Tag msg
 abbr =
     makeTag "abbr"
 
 
-acronym : NormalTag msg
+acronym : Tag msg
 acronym =
     makeTag "acronym"
 
 
-address : NormalTag msg
+address : Tag msg
 address =
     makeTag "address"
 
 
-applet : NormalTag msg
-applet =
-    makeTag "applet"
+
+{- Java Applets are deader than disco
+   applet : Tag msg
+   applet =
+       makeTag "applet"
+-}
 
 
-article : NormalTag msg
+article : Tag msg
 article =
     makeTag "article"
 
 
-aside : NormalTag msg
+aside : Tag msg
 aside =
     makeTag "aside"
 
 
-audio : NormalTag msg
+audio : Tag msg
 audio =
     makeTag "audio"
 
 
-b : NormalTag msg
+b : Tag msg
 b =
     makeTag "b"
 
 
-big : NormalTag msg
+big : Tag msg
 big =
     makeTag "big"
 
 
-blockquote : NormalTag msg
+blockquote : Tag msg
 blockquote =
     makeTag "blockquote"
 
 
-canvas : NormalTag msg
+canvas : Tag msg
 canvas =
     makeTag "canvas"
 
 
-caption : NormalTag msg
+caption : Tag msg
 caption =
     makeTag "caption"
 
 
-center : NormalTag msg
+center : Tag msg
 center =
     makeTag "center"
 
 
-cite : NormalTag msg
+cite : Tag msg
 cite =
     makeTag "cite"
 
 
-code : NormalTag msg
+code : Tag msg
 code =
     makeTag "code"
 
 
-dd : NormalTag msg
+dd : Tag msg
 dd =
     makeTag "dd"
 
 
-del : NormalTag msg
+del : Tag msg
 del =
     makeTag "del"
 
 
-details : NormalTag msg
+details : Tag msg
 details =
     makeTag "details"
 
 
-dfn : NormalTag msg
+dfn : Tag msg
 dfn =
     makeTag "dfn"
 
 
-div : NormalTag msg
+div : Tag msg
 div =
     makeTag "div"
 
 
-dl : NormalTag msg
+dl : Tag msg
 dl =
     makeTag "dl"
 
 
-dt : NormalTag msg
+dt : Tag msg
 dt =
     makeTag "dt"
 
 
-em : NormalTag msg
+em : Tag msg
 em =
     makeTag "em"
 
 
-fieldset : NormalTag msg
+fieldset : Tag msg
 fieldset =
     makeTag "fieldset"
 
 
-figcaption : NormalTag msg
+figcaption : Tag msg
 figcaption =
     makeTag "figcaption"
 
 
-figure : NormalTag msg
+figure : Tag msg
 figure =
     makeTag "figure"
 
 
-footer : NormalTag msg
+footer : Tag msg
 footer =
     makeTag "footer"
 
 
-form : NormalTag msg
+form : Tag msg
 form =
     makeTag "form"
 
 
-h1 : NormalTag msg
+h1 : Tag msg
 h1 =
     makeTag "h1"
 
 
-h2 : NormalTag msg
+h2 : Tag msg
 h2 =
     makeTag "h2"
 
 
-h3 : NormalTag msg
+h3 : Tag msg
 h3 =
     makeTag "h3"
 
 
-h4 : NormalTag msg
+h4 : Tag msg
 h4 =
     makeTag "h4"
 
 
-h5 : NormalTag msg
+h5 : Tag msg
 h5 =
     makeTag "h5"
 
 
-h6 : NormalTag msg
+h6 : Tag msg
 h6 =
     makeTag "h6"
 
 
-header : NormalTag msg
+header : Tag msg
 header =
     makeTag "header"
 
 
-hgroup : NormalTag msg
+hgroup : Tag msg
 hgroup =
     makeTag "hgroup"
 
 
-i : NormalTag msg
+i : Tag msg
 i =
     makeTag "i"
 
 
-iframe : NormalTag msg
+iframe : Tag msg
 iframe =
     makeTag "iframe"
 
 
-ins : NormalTag msg
+ins : Tag msg
 ins =
     makeTag "ins"
 
 
-kbd : NormalTag msg
+kbd : Tag msg
 kbd =
     makeTag "kbd"
 
 
-label : NormalTag msg
+label : Tag msg
 label =
     makeTag "label"
 
 
-legend : NormalTag msg
+legend : Tag msg
 legend =
     makeTag "legend"
 
 
-li : NormalTag msg
+li : Tag msg
 li =
     makeTag "li"
 
 
-mark : NormalTag msg
+mark : Tag msg
 mark =
     makeTag "mark"
 
 
-menu : NormalTag msg
+menu : Tag msg
 menu =
     makeTag "menu"
 
 
-nav : NormalTag msg
+nav : Tag msg
 nav =
     makeTag "nav"
 
 
-object : NormalTag msg
+object : Tag msg
 object =
     makeTag "object"
 
 
-ol : NormalTag msg
+ol : Tag msg
 ol =
     makeTag "ol"
 
 
-output : NormalTag msg
+output : Tag msg
 output =
     makeTag "output"
 
 
-p : NormalTag msg
+p : Tag msg
 p =
     makeTag "p"
 
 
-pre : NormalTag msg
+pre : Tag msg
 pre =
     makeTag "pre"
 
 
-q : NormalTag msg
+q : Tag msg
 q =
     makeTag "q"
 
 
-ruby : NormalTag msg
+ruby : Tag msg
 ruby =
     makeTag "ruby"
 
 
-s : NormalTag msg
+s : Tag msg
 s =
     makeTag "s"
 
 
-samp : NormalTag msg
+samp : Tag msg
 samp =
     makeTag "samp"
 
 
-section : NormalTag msg
+section : Tag msg
 section =
     makeTag "section"
 
 
-small : NormalTag msg
+small : Tag msg
 small =
     makeTag "small"
 
 
-span : NormalTag msg
+span : Tag msg
 span =
     makeTag "span"
 
 
-strike : NormalTag msg
+strike : Tag msg
 strike =
     makeTag "strike"
 
 
-strong : NormalTag msg
+strong : Tag msg
 strong =
     makeTag "strong"
 
 
-sub : NormalTag msg
+sub : Tag msg
 sub =
     makeTag "sub"
 
 
-summary : NormalTag msg
+summary : Tag msg
 summary =
     makeTag "summary"
 
 
-sup : NormalTag msg
+sup : Tag msg
 sup =
     makeTag "sup"
 
 
-table : NormalTag msg
+table : Tag msg
 table =
     makeTag "table"
 
 
-tbody : NormalTag msg
+tbody : Tag msg
 tbody =
     makeTag "tbody"
 
 
-td : NormalTag msg
+td : Tag msg
 td =
     makeTag "td"
 
 
-tfoot : NormalTag msg
+tfoot : Tag msg
 tfoot =
     makeTag "tfoot"
 
 
-th : NormalTag msg
+th : Tag msg
 th =
     makeTag "th"
 
 
-thead : NormalTag msg
+thead : Tag msg
 thead =
     makeTag "thead"
 
 
-time : NormalTag msg
+time : Tag msg
 time =
     makeTag "time"
 
 
-tr : NormalTag msg
+tr : Tag msg
 tr =
     makeTag "tr"
 
 
-tt : NormalTag msg
+tt : Tag msg
 tt =
     makeTag "tt"
 
 
-u : NormalTag msg
+u : Tag msg
 u =
     makeTag "u"
 
 
-ul : NormalTag msg
+ul : Tag msg
 ul =
     makeTag "ul"
 
 
-var : NormalTag msg
+var : Tag msg
 var =
     makeTag "var"
 
 
-video : NormalTag msg
+video : Tag msg
 video =
     makeTag "video"
