@@ -1,18 +1,27 @@
 # Orange Reset 
 
-Provides components that follow meyer reset styles similar to Yelp's Lemon Reset
-https://engineeringblog.yelp.com/2018/03/css-in-the-age-of-react.html
+Provides tags that include "reset" styles similar to
+Yelp's [lemon reset](https://github.com/Yelp/lemon-reset) library for React.
+
+For an explanation of why Yelp originally moved away from relying on
+page-global css resets and the benefits of including the resets opaquely
+within tags, i recommend reading [this blog post](https://engineeringblog.yelp.com/2018/03/css-in-the-age-of-react.html)
+from their engineering team.
+
+Effectively speaking, the tags provided here default to having 
+styling as if this stylesheet were to be applied to them.
+
 ```css
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
 */
-small, strike, strong, sub, sup, tt, var,
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
 b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
@@ -52,3 +61,11 @@ table {
 	border-spacing: 0;
 }
 ```
+
+These tags use [elm-css](https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/Css)
+for their implementation. This is neccisary because the stylesheet that is
+being replicated makes use of the `:before` and `:after` css pseudo-selectors
+in order to style the `blockquote` and `q` tags. As far as I am aware 
+[it is impossible to use pseudo-selectors in inline css](https://stackoverflow.com/questions/5293280/css-pseudo-classes-with-inline-styles),
+so making an inline stylesheet with (as is done by elm-css) is the best way
+to make these tags shareable.
