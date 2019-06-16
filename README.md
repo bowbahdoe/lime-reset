@@ -6,11 +6,10 @@ Yelp's [lemon-reset](https://github.com/Yelp/lemon-reset) library for React.
 
 For an explanation of why Yelp originally moved away from relying on
 page-global css resets and the benefits of including the resets opaquely
-within tags, i recommend reading [this blog post](https://engineeringblog.yelp.com/2018/03/css-in-the-age-of-react.html)
+within tags, I recommend reading [this blog post](https://engineeringblog.yelp.com/2018/03/css-in-the-age-of-react.html)
 from their engineering team.
 
-Effectively speaking, the tags provided here default to having 
-styling as if this stylesheet were to be applied to them.
+Effectively these tags have  styling as if this stylesheet was applied to them.
 
 ```css
 /* http://meyerweb.com/eric/tools/css/reset/ 

@@ -86,30 +86,43 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attributes
 
 
+{-| The name of a tag. This module is pretty loose with static typing, so this is
+just here to make type signatures easier to read.
+-}
 type alias TagName =
     String
 
 
+{-| A mapping from the name of a tag to the list of styles that should be applied
+to that tag.
+-}
 type alias StyleDict =
     Dict TagName (List Css.Style)
 
 
+{-| Combines two dictionaries of the same type using the given function to combine any
+values that are under the same key.
+-}
+combineDicts : (a -> a -> a) -> Dict comparable a -> Dict comparable a -> Dict comparable a
+combineDicts mergeValues d1 d2 =
+    Dict.merge
+        Dict.insert
+        (\k v1 v2 -> Dict.insert k (mergeValues v1 v2))
+        Dict.insert
+        d1
+        d2
+        Dict.empty
+
+
 mergeTagStyleDicts : List StyleDict -> StyleDict
 mergeTagStyleDicts dicts =
-    let
-        mergeTwo : StyleDict -> StyleDict -> StyleDict
-        mergeTwo d1 d2 =
-            Dict.merge
-                (\tagName style1 newDict -> Dict.insert tagName style1 newDict)
-                (\tagName style1 style2 newDict -> Dict.insert tagName (style1 ++ style2) newDict)
-                (\tagName style2 newDict -> Dict.insert tagName style2 newDict)
-                d1
-                d2
-                Dict.empty
-    in
-    List.foldl mergeTwo Dict.empty dicts
+    List.foldl (combineDicts (++)) Dict.empty dicts
 
 
+{-| Shorthand to make a dictionary that associates a bunch of tags with a set of styles.
+For this module, there are a lot more tag names than styles to associate and the styles
+aren't such that they can be given sensible names.
+-}
 makeStyleDict : List TagName -> List Css.Style -> StyleDict
 makeStyleDict tagNames style =
     Dict.fromList (List.map (\tagName -> ( tagName, style )) tagNames)
@@ -119,7 +132,7 @@ styleDict : StyleDict
 styleDict =
     mergeTagStyleDicts
         [ makeStyleDict
-            [ "html"
+            [ "html" -- TODO: This is the only tag that i do not expose. What use would `html` be even?
             , "body"
             , "div"
             , "span"
@@ -250,6 +263,10 @@ tagStyle tagName =
     Css.batch (Maybe.withDefault [] (Dict.get tagName styleDict))
 
 
+{-| A "normal" html tag. It takes in a list of attributes and a list of
+children in order to produce some html. This type signature is repeated quite a bit,
+so it is worth making this alias as a shorthand.
+-}
 type alias NormalTag msg =
     List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
 
