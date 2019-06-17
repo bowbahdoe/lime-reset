@@ -1,91 +1,61 @@
 module Lime exposing
-    ( a
-    , abbr
-    , acronym
-    , address
-    , article
-    , aside
-    , audio
-    , b
-    , big
-    , blockquote
-    , canvas
-    , caption
-    , center
-    , cite
-    , code
-    , dd
-    , del
-    , details
-    , dfn
-    , div
-    , dl
-    , dt
-    , em
-    , embed
-    , fieldset
-    , figcaption
-    , figure
-    , footer
-    , form
-    , h1
-    , h2
-    , h3
-    , h4
-    , h5
-    , h6
-    , header
-    , hgroup
-    , i
-    , iframe
-    , img
-    , ins
+    ( a, abbr, acronym, address, article, aside, audio
+    , b, big, blockquote
+    , canvas, caption, center, cite, code
+    , dd, del, details, dfn, div, dl, dt
+    , em, embed
+    , fieldset, figcaption, figure, footer, form
+    , h1, h2, h3, h4, h5, h6, header, hgroup
+    , i, iframe, img, ins
     , kbd
-    , label
-    , legend
-    , li
-    , mark
-    , menu
+    , label, legend, li
+    , mark, menu
     , nav
-    , object
-    , ol
-    , output
-    , p
-    , pre
+    , object, ol, output
+    , p, pre
     , q
     , ruby
-    , s
-    , samp
-    , section
-    , small
-    , span
-    , strike
-    , strong
-    , sub
-    , summary
-    , sup
-    , table
-    , tbody
-    , td
-    , tfoot
-    , th
-    , thead
-    , time
-    , tr
-    , tt
-    , u
-    , ul
-    , var
-    , video
+    , s, samp, section, small, span, strike, strong, sub, summary, sup
+    , table, tbody, td, tfoot, th, thead, time, tr, tt
+    , u, ul
+    , var, video
     )
+
+{-|
+
+
+# Tags
+
+@docs a, abbr, acronym, address, article, aside, audio
+@docs b, big, blockquote
+@docs canvas, caption, center, cite, code
+@docs dd, del, details, dfn, div, dl, dt
+@docs em, embed
+@docs fieldset, figcaption, figure, footer, form
+@docs h1, h2, h3, h4, h5, h6, header, hgroup
+@docs i, iframe, img, ins
+@docs kbd
+@docs label, legend, li
+@docs mark, menu
+@docs nav
+@docs object, ol, output
+@docs p, pre
+@docs q
+@docs ruby
+@docs s, samp, section, small, span, strike, strong, sub, summary, sup
+@docs table, tbody, td, tfoot, th, thead, time, tr, tt
+@docs u, ul
+@docs var, video
+
+-}
 
 import Css
 import Dict exposing (Dict)
 import Html.Styled as Html
 
 
-{-| The name of a tag. This module is pretty loose with static typing, so this is
-just here to make type signatures easier to read.
+{-| The name of a tag. This module is pretty loose with static typing, so this doesn't provide
+any more "safety", it isjust here to make type signatures easier to read.
 -}
 type alias TagName =
     String
@@ -98,6 +68,8 @@ type alias StyleDict =
     Dict TagName (List Css.Style)
 
 
+{-| Helper function for making a StyleDict.
+-}
 makeStyleDict : List ( List TagName, List Css.Style ) -> StyleDict
 makeStyleDict stylePairs =
     let
@@ -115,10 +87,12 @@ makeStyleDict stylePairs =
         makeDict ( tagNames, styles ) =
             Dict.fromList (List.map (\tagName -> ( tagName, styles )) tagNames)
     in
-    List.foldl (combineDicts (++)) Dict.empty (List.map makeDict stylePairs)
+    stylePairs
+        |> List.map makeDict
+        |> List.foldl (combineDicts (++)) Dict.empty
 
 
-{-| The actual meyer reset stylings.
+{-| The actual meyer reset styles.
 -}
 meyerStyles : StyleDict
 meyerStyles =
@@ -276,31 +250,37 @@ makeTag tagName =
 -}
 
 
+{-| -}
 embed : Tag msg
 embed =
     makeTag "embed"
 
 
+{-| -}
 img : Tag msg
 img =
     makeTag "img"
 
 
+{-| -}
 a : Tag msg
 a =
     makeTag "a"
 
 
+{-| -}
 abbr : Tag msg
 abbr =
     makeTag "abbr"
 
 
+{-| -}
 acronym : Tag msg
 acronym =
     makeTag "acronym"
 
 
+{-| -}
 address : Tag msg
 address =
     makeTag "address"
@@ -314,361 +294,433 @@ address =
 -}
 
 
+{-| -}
 article : Tag msg
 article =
     makeTag "article"
 
 
+{-| -}
 aside : Tag msg
 aside =
     makeTag "aside"
 
 
+{-| -}
 audio : Tag msg
 audio =
     makeTag "audio"
 
 
+{-| -}
 b : Tag msg
 b =
     makeTag "b"
 
 
+{-| -}
 big : Tag msg
 big =
     makeTag "big"
 
 
+{-| -}
 blockquote : Tag msg
 blockquote =
     makeTag "blockquote"
 
 
+{-| -}
 canvas : Tag msg
 canvas =
     makeTag "canvas"
 
 
+{-| -}
 caption : Tag msg
 caption =
     makeTag "caption"
 
 
+{-| -}
 center : Tag msg
 center =
     makeTag "center"
 
 
+{-| -}
 cite : Tag msg
 cite =
     makeTag "cite"
 
 
+{-| -}
 code : Tag msg
 code =
     makeTag "code"
 
 
+{-| -}
 dd : Tag msg
 dd =
     makeTag "dd"
 
 
+{-| -}
 del : Tag msg
 del =
     makeTag "del"
 
 
+{-| -}
 details : Tag msg
 details =
     makeTag "details"
 
 
+{-| -}
 dfn : Tag msg
 dfn =
     makeTag "dfn"
 
 
+{-| -}
 div : Tag msg
 div =
     makeTag "div"
 
 
+{-| -}
 dl : Tag msg
 dl =
     makeTag "dl"
 
 
+{-| -}
 dt : Tag msg
 dt =
     makeTag "dt"
 
 
+{-| -}
 em : Tag msg
 em =
     makeTag "em"
 
 
+{-| -}
 fieldset : Tag msg
 fieldset =
     makeTag "fieldset"
 
 
+{-| -}
 figcaption : Tag msg
 figcaption =
     makeTag "figcaption"
 
 
+{-| -}
 figure : Tag msg
 figure =
     makeTag "figure"
 
 
+{-| -}
 footer : Tag msg
 footer =
     makeTag "footer"
 
 
+{-| -}
 form : Tag msg
 form =
     makeTag "form"
 
 
+{-| -}
 h1 : Tag msg
 h1 =
     makeTag "h1"
 
 
+{-| -}
 h2 : Tag msg
 h2 =
     makeTag "h2"
 
 
+{-| -}
 h3 : Tag msg
 h3 =
     makeTag "h3"
 
 
+{-| -}
 h4 : Tag msg
 h4 =
     makeTag "h4"
 
 
+{-| -}
 h5 : Tag msg
 h5 =
     makeTag "h5"
 
 
+{-| -}
 h6 : Tag msg
 h6 =
     makeTag "h6"
 
 
+{-| -}
 header : Tag msg
 header =
     makeTag "header"
 
 
+{-| -}
 hgroup : Tag msg
 hgroup =
     makeTag "hgroup"
 
 
+{-| -}
 i : Tag msg
 i =
     makeTag "i"
 
 
+{-| -}
 iframe : Tag msg
 iframe =
     makeTag "iframe"
 
 
+{-| -}
 ins : Tag msg
 ins =
     makeTag "ins"
 
 
+{-| -}
 kbd : Tag msg
 kbd =
     makeTag "kbd"
 
 
+{-| -}
 label : Tag msg
 label =
     makeTag "label"
 
 
+{-| -}
 legend : Tag msg
 legend =
     makeTag "legend"
 
 
+{-| -}
 li : Tag msg
 li =
     makeTag "li"
 
 
+{-| -}
 mark : Tag msg
 mark =
     makeTag "mark"
 
 
+{-| -}
 menu : Tag msg
 menu =
     makeTag "menu"
 
 
+{-| -}
 nav : Tag msg
 nav =
     makeTag "nav"
 
 
+{-| -}
 object : Tag msg
 object =
     makeTag "object"
 
 
+{-| -}
 ol : Tag msg
 ol =
     makeTag "ol"
 
 
+{-| -}
 output : Tag msg
 output =
     makeTag "output"
 
 
+{-| -}
 p : Tag msg
 p =
     makeTag "p"
 
 
+{-| -}
 pre : Tag msg
 pre =
     makeTag "pre"
 
 
+{-| -}
 q : Tag msg
 q =
     makeTag "q"
 
 
+{-| -}
 ruby : Tag msg
 ruby =
     makeTag "ruby"
 
 
+{-| -}
 s : Tag msg
 s =
     makeTag "s"
 
 
+{-| -}
 samp : Tag msg
 samp =
     makeTag "samp"
 
 
+{-| -}
 section : Tag msg
 section =
     makeTag "section"
 
 
+{-| -}
 small : Tag msg
 small =
     makeTag "small"
 
 
+{-| -}
 span : Tag msg
 span =
     makeTag "span"
 
 
+{-| -}
 strike : Tag msg
 strike =
     makeTag "strike"
 
 
+{-| -}
 strong : Tag msg
 strong =
     makeTag "strong"
 
 
+{-| -}
 sub : Tag msg
 sub =
     makeTag "sub"
 
 
+{-| -}
 summary : Tag msg
 summary =
     makeTag "summary"
 
 
+{-| -}
 sup : Tag msg
 sup =
     makeTag "sup"
 
 
+{-| -}
 table : Tag msg
 table =
     makeTag "table"
 
 
+{-| -}
 tbody : Tag msg
 tbody =
     makeTag "tbody"
 
 
+{-| -}
 td : Tag msg
 td =
     makeTag "td"
 
 
+{-| -}
 tfoot : Tag msg
 tfoot =
     makeTag "tfoot"
 
 
+{-| -}
 th : Tag msg
 th =
     makeTag "th"
 
 
+{-| -}
 thead : Tag msg
 thead =
     makeTag "thead"
 
 
+{-| -}
 time : Tag msg
 time =
     makeTag "time"
 
 
+{-| -}
 tr : Tag msg
 tr =
     makeTag "tr"
 
 
+{-| -}
 tt : Tag msg
 tt =
     makeTag "tt"
 
 
+{-| -}
 u : Tag msg
 u =
     makeTag "u"
 
 
+{-| -}
 ul : Tag msg
 ul =
     makeTag "ul"
 
 
+{-| -}
 var : Tag msg
 var =
     makeTag "var"
 
 
+{-| -}
 video : Tag msg
 video =
     makeTag "video"
